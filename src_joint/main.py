@@ -648,7 +648,7 @@ def run_parse(args):
     parser.contributions = (args.contributions == 1)
     parser.eval()
     print("Parsing sentences...")
-    with open(args.input_path) as input_file:
+    with open(args.input_path, 'r', encoding='utf-8') as input_file:
         sentences = input_file.readlines()
 
     sentences = [sentence.strip() for sentence in sentences if len(sentence.strip()) > 0]
@@ -681,19 +681,19 @@ def run_parse(args):
         pred_type = [[leaf.type for leaf in tree.leaves()] for tree in syntree_pred]
         appent_string = "_" + str(cun) + ".txt"
         if args.output_path_synconst != '-':
-            with open(args.output_path_synconst + appent_string, 'w') as output_file:
+            with open(args.output_path_synconst + appent_string, 'w', encoding='utf-8') as output_file:
                 for tree in syntree_pred:
                     output_file.write("{}\n".format(tree.convert().linearize()))
             print("Output written to:", args.output_path_synconst)
 
         if args.output_path_syndep != '-':
-            with open(args.output_path_syndep + appent_string, 'w') as output_file:
+            with open(args.output_path_syndep + appent_string, 'w', encoding='utf-8') as output_file:
                 for heads in pred_head:
                     output_file.write("{}\n".format(heads))
             print("Output written to:", args.output_path_syndep)
 
         if args.output_path_synlabel != '-':
-            with open(args.output_path_synlabel + appent_string, 'w') as output_file:
+            with open(args.output_path_synlabel + appent_string, 'w', encoding='utf-8') as output_file:
                 for labels in pred_type:
                     output_file.write("{}\n".format(labels))
             print("Output written to:", args.output_path_synlabel)
