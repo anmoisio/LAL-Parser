@@ -1,0 +1,4 @@
+src_joint/__pycache__/
+*.out
+EVALB/evalb
+*.pt
