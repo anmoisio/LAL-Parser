@@ -20,7 +20,15 @@ import utils
 import json
 tokens = KM_parser
 import nltk
-from nltk import word_tokenize, sent_tokenize
+# from nltk import word_tokenize, sent_tokenize
+import spacy
+try:
+    nlp = spacy.load('en_core_web_sm')
+except OSError:
+    print('Downloading spacy model...')
+    from spacy.cli import download
+    download('en_core_web_sm')
+    nlp = spacy.load('en_core_web_sm')
 from tqdm import tqdm
 
 uid = uuid.uuid4().hex[:6]
@@ -656,7 +664,7 @@ def run_parse(args):
     if args.max_tokens > 0:
         tmp = []
         for sentence in sentences:
-            sub_sentences = [word_tokenize(sub_sentence) for sub_sentence in sent_tokenize(sentence)]
+            sub_sentences = [[token.text for token in sent] for sent in nlp(sentence).sents]
             this_sentence = sub_sentences[0][:args.max_tokens]
             this_idx = 1
             move_on = False
@@ -703,9 +711,9 @@ def run_parse(args):
     for start_index in tqdm(range(0, len(sentences), args.eval_batch_size), desc='Parsing sentences'):
         subbatch_sentences = sentences[start_index:start_index+args.eval_batch_size]
         if args.pos_tag == 2:
-            tagged_sentences = [[(dummy_tag, REVERSE_TOKEN_MAPPING.get(word, word)) for word in word_tokenize(sentence)] for sentence in subbatch_sentences]
+            tagged_sentences = [[(dummy_tag, REVERSE_TOKEN_MAPPING.get(word.text, word.text)) for word in nlp(sentence)] for sentence in subbatch_sentences]
         elif args.pos_tag == 1:
-            tagged_sentences = [[(REVERSE_TOKEN_MAPPING.get(tag, tag), REVERSE_TOKEN_MAPPING.get(word, word)) for word, tag in nltk.pos_tag(word_tokenize(sentence))] for sentence in subbatch_sentences]
+            tagged_sentences = [[(REVERSE_TOKEN_MAPPING.get(tag, tag), REVERSE_TOKEN_MAPPING.get(word, word)) for word, tag in nltk.pos_tag([token.text for token in nlp(sentence)])] for sentence in subbatch_sentences]
         else:
             tagged_sentences = [[(REVERSE_TOKEN_MAPPING.get(word.split('_')[0],word.split('_')[0]), REVERSE_TOKEN_MAPPING.get(word.split('_')[1],word.split('_')[1])) for word in sentence.split()] for sentence in subbatch_sentences]
         syntree, _ = parser.parse_batch(tagged_sentences)
