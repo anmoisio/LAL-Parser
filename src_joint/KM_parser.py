@@ -1287,7 +1287,7 @@ class ChartParser(nn.Module):
                 self.bert_transliterate = None
 
             d_xlnet_annotations = self.xlnet.d_model
-            self.xlnet_max_len = 768
+            self.xlnet_max_len = 770
 
             self.project_xlnet = nn.Linear(d_xlnet_annotations, ex_dim, bias=False)
 
